@@ -1,0 +1,20 @@
+name: busybox
+version: 1.0
+summary: busybox example to showcase the snapcraft kbuild plugin
+description: this is a snapcraft example package that contains the output of the snapcraft busybox example.
+icon: icon.png
+
+binaries:
+  ls:
+    exec: bin/ls
+
+parts:
+  busybox:
+    plugin: kbuild
+    source: git://github.com/asac/busybox
+    kconfigs:
+     - CONFIG_FEATURE_SUID=n
+     - CONFIG_HTTPD=n
+    snap:
+     -  bin/*
+

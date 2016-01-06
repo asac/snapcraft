@@ -49,6 +49,16 @@ def run(cmd, **kwargs):
         f.flush()
         subprocess.check_call(['/bin/sh', f.name] + cmd, **kwargs)
 
+def run_raw(cmd, **kwargs):
+    assert isinstance(cmd, list), 'run command must be a string'
+    # FIXME: This is gross to keep writing this, even when env is the same
+    with tempfile.NamedTemporaryFile(mode='w+') as f:
+        f.write(assemble_env())
+        f.write('\n')
+        f.write(' '.join(cmd)+'\n')
+        f.flush()
+        subprocess.check_call(['/bin/sh', f.name], **kwargs)
+
 
 def run_output(cmd, **kwargs):
     assert isinstance(cmd, list), 'run command must be a list'
