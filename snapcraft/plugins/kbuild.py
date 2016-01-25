@@ -93,6 +93,9 @@ class KBuildPlugin(snapcraft.BasePlugin):
             'make',
         ])
 
+        self.make_targets=[]
+        self.make_install_targets=[ 'install' ]
+
     def do_base_config(self,config_path):
         # if kconfigfile is provided use that
         # otherwise use defconfig to seed the base config
@@ -128,11 +131,11 @@ class KBuildPlugin(snapcraft.BasePlugin):
 
     def do_build(self):
         # build the software
-        self.run(['make'])
+        self.run(['make'] + self.make_targets)
 
     def do_install(self):
         # install to installdir
-        self.run(['make', 'CONFIG_PREFIX='+self.installdir, 'install'])
+        self.run(['make', 'CONFIG_PREFIX='+self.installdir] + self.make_install_targets)
 
     def build(self):
         super().build()
