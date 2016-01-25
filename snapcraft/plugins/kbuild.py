@@ -116,14 +116,14 @@ class KBuildPlugin(snapcraft.BasePlugin):
             config=config+"\n\n"+f.read()
             f.close()
 
-        with open(config_path, "w") as f:
-            f.write(config)
-            f.close()
-
         # note that prepending and appending the overrides seems
         # only way to convince all kbuild versions to pick up the
         # configs during oldconfig in .config
         config=config + "\n\n" + "\n".join(self.options.kconfigs)
+
+        with open(config_path, "w") as f:
+            f.write(config)
+            f.close()
 
     def do_remake_config(self):
         # update config to include kconfig amendments using oldconfig
