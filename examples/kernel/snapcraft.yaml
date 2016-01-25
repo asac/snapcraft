@@ -1,0 +1,19 @@
+name: kernel-snap-example
+version: 0
+summary: a snappy DIY kernel build using snapcraft
+description: kernel as a service
+icon: icon.png
+
+parts:
+  kernel:
+    parallel: true
+    plugin: kernel
+    source: ../../target/kernel
+    kdefconfig: x86_64_defconfig
+    kconfigs:
+      - CONFIG_LOCALVERSION="-kernel-snap-example"
+      - CONFIG_LOCALVERSION_AUTO=y
+      - CONFIG_SQUASHFS=y
+      - CONFIG_SQUASHFS_XZ=y
+    verbose: true
+
