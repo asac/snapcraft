@@ -48,6 +48,7 @@ def run(cmd, **kwargs):
         f.flush()
         subprocess.check_call(['/bin/sh', f.name] + cmd, **kwargs)
 
+
 def run_raw(cmd, **kwargs):
     assert isinstance(cmd, list), 'run command must be a string'
     # FIXME: This is gross to keep writing this, even when env is the same
@@ -126,14 +127,17 @@ def reset_env():
     global env
     env = []
 
+
 def set_build_threads(j):
     global j_count
     j_count = j
 
+
 def get_build_threads():
-    if j_count <=0:
+    if j_count <= 0:
         return multiprocessing.cpu_count() + 1
     return j_count
+
 
 def replace_in_file(directory, file_pattern, search_pattern, replacement):
     """Searches and replaces patterns that match a file pattern.
