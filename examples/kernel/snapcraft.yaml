@@ -1,8 +1,9 @@
 name: kernel-snap-example
 version: 0
 summary: a snappy DIY kernel build using snapcraft
-description: kernel as a service
+description: kernel as a snap
 icon: icon.png
+type: kernel
 
 parts:
   kernel:
@@ -15,5 +16,7 @@ parts:
       - CONFIG_LOCALVERSION_AUTO=y
       - CONFIG_SQUASHFS=y
       - CONFIG_SQUASHFS_XZ=y
+    kernel-initrd-mods:
+      - nf_nat
+    kernel-image-path: arch/x86/boot/bzImage
     verbose: true
-
