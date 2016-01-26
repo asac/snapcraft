@@ -7,9 +7,8 @@ type: kernel
 
 parts:
   kernel:
-    parallel: true
     plugin: kernel
-    # source: ../../target/kernel
+    #source: ../../target/kernel
     source: https://github.com/torvalds/linux
     source-type: git
     kdefconfig: x86_64_defconfig
@@ -21,4 +20,3 @@ parts:
     kernel-initrd-mods:
       - nf_nat
     kernel-image-path: arch/x86/boot/bzImage
-    verbose: true
