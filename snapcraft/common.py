@@ -133,7 +133,7 @@ def set_build_threads(j):
 def get_build_threads():
     if j_count <=0:
         return multiprocessing.cpu_count() + 1
-    return j_count     
+    return j_count
 
 def replace_in_file(directory, file_pattern, search_pattern, replacement):
     """Searches and replaces patterns that match a file pattern.
