@@ -83,7 +83,7 @@ class KernelPlugin(snapcraft.plugins.kbuild.KBuildPlugin):
 
     def __init__(self, name, options):
         super().__init__(name, options)
-        self.make_targets = [ self.options.kernel_image_target ]
+        self.make_targets = [ self.options.kernel_image_target, 'modules' ]
         self.make_install_targets = [ "modules_install", "INSTALL_MOD_PATH="+self.installdir ]
 
     def make_initrd(self):
