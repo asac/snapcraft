@@ -28,9 +28,10 @@ the configured kconfigs values to the .config and running
 
 to create an updated .config file.
 
-If kconfigfile is provided this plugin will use the provided config file wholesale
-as the starting point instead of make $kdefconfig. In case user configures both a
-kdefconfig as well as kconfigfile, kconfigfile approach will be used.
+If kconfigfile is provided this plugin will use the provided config file
+wholesale as the starting point instead of make $kdefconfig. In case user
+configures both a kdefconfig as well as kconfigfile, kconfigfile approach will
+be used.
 
 This plugin is based on the snapcraft.BasePlugin and supports the properties
 provided by that plus the following kbuild specific options with semantics as
@@ -42,21 +43,22 @@ explained above:
 
     - kconfigfile:
       (filepath)
-      path to file to use as base configuration. If provided this option wins over
-      kdefconfig. default: None
+      path to file to use as base configuration. If provided this option wins
+      over kdefconfig. default: None
 
     - kconfigs
       (list of strings)
-      explicit list of configs to force; this will override the configs that were
-      set as base through kdefconfig and kconfigfile and dependent configs will be
-      fixed using the defaults encoded in the kbuild config definitions. If you dont
-      want default for one or more implicit configs coming out of these, just add them
-      to this list as well.
+      explicit list of configs to force; this will override the configs that
+      were set as base through kdefconfig and kconfigfile and dependent configs
+      will be fixed using the defaults encoded in the kbuild config
+      definitions.  If you dont want default for one or more implicit configs
+      coming out of these, just add them to this list as well.
 
 """
 
 import os
 import snapcraft
+from snapcraft import common
 
 
 class KBuildPlugin(snapcraft.BasePlugin):
@@ -93,10 +95,10 @@ class KBuildPlugin(snapcraft.BasePlugin):
             'make',
         ])
 
-        self.make_targets=[]
-        self.make_install_targets=[ 'install' ]
+        self.make_targets = []
+        self.make_install_targets = ['install']
 
-    def do_base_config(self,config_path):
+    def do_base_config(self, config_path):
         # if kconfigfile is provided use that
         # otherwise use defconfig to seed the base config
         if self.options.kconfigfile is None:
@@ -110,16 +112,16 @@ class KBuildPlugin(snapcraft.BasePlugin):
         #  - concat kconfigs to buffer
         #  - read current .config and append
         #  - write out to disk
-        config="\n".join(self.options.kconfigs)
+        config = "\n".join(self.options.kconfigs)
 
         with open(config_path, "r") as f:
-            config=config+"\n\n"+f.read()
+            config = config + "\n\n" + f.read()
             f.close()
 
         # note that prepending and appending the overrides seems
         # only way to convince all kbuild versions to pick up the
         # configs during oldconfig in .config
-        config=config + "\n\n" + "\n".join(self.options.kconfigs)
+        config = config + "\n\n" + "\n".join(self.options.kconfigs)
 
         with open(config_path, "w") as f:
             f.write(config)
@@ -131,16 +133,18 @@ class KBuildPlugin(snapcraft.BasePlugin):
 
     def do_build(self):
         # build the software
-        self.run(['make'] + self.make_targets)
+        self.run(['make', '-j' + str(common.get_build_threads())]
+                 + self.make_targets)
 
     def do_install(self):
         # install to installdir
-        self.run(['make', 'CONFIG_PREFIX='+self.installdir] + self.make_install_targets)
+        self.run(['make', 'CONFIG_PREFIX='+self.installdir,
+                  '-j' + str(common.get_build_threads())]
+                 + self.make_install_targets)
 
     def build(self):
         super().build()
 
-        config = ""
         config_path = os.path.join(self.builddir, ".config")
 
         self.do_base_config(config_path)
