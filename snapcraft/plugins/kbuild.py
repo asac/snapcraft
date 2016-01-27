@@ -98,12 +98,18 @@ class KBuildPlugin(snapcraft.BasePlugin):
         self.make_targets = []
         self.make_install_targets = ['install']
 
+    def get_verbose_makeflags(self):
+        if common.get_verbose():
+            return ['V=1']
+        return []
+
     def do_base_config(self, config_path):
         # if kconfigfile is provided use that
         # otherwise use defconfig to seed the base config
         if self.options.kconfigfile is None:
             # first run defconfig for setting baseline
-            self.run(['make', self.options.kdefconfig])
+            self.run(['make', self.options.kdefconfig]
+                     + self.get_verbose_makeflags())
         else:
             os.copy(self.options.kconfigfile, config_path)
 
@@ -129,17 +135,21 @@ class KBuildPlugin(snapcraft.BasePlugin):
 
     def do_remake_config(self):
         # update config to include kconfig amendments using oldconfig
-        self.run_raw(['\"yes\"', '\"\"', '|' 'make', 'oldconfig'])
+        self.run_raw(['\"yes\"', '\"\"', '|' 'make', 'oldconfig']
+                     + self.get_verbose_makeflags())
 
     def do_build(self):
         # build the software
-        self.run(['make', '-j' + str(common.get_build_threads())]
+        self.run(['make',
+                  '-j' + str(common.get_build_threads())]
+                 + self.get_verbose_makeflags()
                  + self.make_targets)
 
     def do_install(self):
         # install to installdir
         self.run(['make', 'CONFIG_PREFIX='+self.installdir,
                   '-j' + str(common.get_build_threads())]
+                 + self.get_verbose_makeflags()
                  + self.make_install_targets)
 
     def build(self):
