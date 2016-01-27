@@ -19,4 +19,6 @@ parts:
       - CONFIG_SQUASHFS_XZ=y
     kernel-initrd-mods:
       - nf_nat
+    kernel-initrd-fws:
+      - lib/firmware/atmsar11.fw
     kernel-image-path: arch/x86/boot/bzImage

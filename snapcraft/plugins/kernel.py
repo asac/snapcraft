@@ -29,6 +29,16 @@ The following kernel specific options are provided by this plugin:
       provide the core bootlogic which comes from snappy Ubuntu Core
       OS snap. Include all modules you need for mounting rootfs here.
 
+    - kernel-with-firmware:
+      (boolean; default: True)
+      use this flag to disable shipping binary firmwares
+
+    - kernel-initrd-fws:
+      (array of string)
+      list of firmware files to include in the initrd; these need to be
+      relative paths to .installdir and this option does not work if you
+      disable building firmware
+
     - kernel-initrd-comp:
       (string; default: gz)
       initrd compression to use; values supported: none, gz, bz2, xz
@@ -59,7 +69,22 @@ class KernelPlugin(snapcraft.plugins.kbuild.KBuildPlugin):
             'default': 'bzImage',
         }
 
+        schema['properties']['kernel-with-firmware'] = {
+            'type': 'string',
+            'default': "true",
+        }
+
         schema['properties']['kernel-initrd-mods'] = {
+            'type': 'array',
+            'minitems': 0,
+            'uniqueItems': True,
+            'items': {
+                'type': 'string',
+            },
+            'default': [],
+        }
+
+        schema['properties']['kernel-initrd-fws'] = {
             'type': 'array',
             'minitems': 0,
             'uniqueItems': True,
@@ -85,7 +110,15 @@ class KernelPlugin(snapcraft.plugins.kbuild.KBuildPlugin):
         super().__init__(name, options)
         self.make_targets = [self.options.kernel_image_target, 'modules']
         self.make_install_targets = ["modules_install",
-                                     "INSTALL_MOD_PATH="+self.installdir]
+                                     "INSTALL_MOD_PATH="
+                                     + self.installdir]
+        self.make_install_targets.extend(self.get_fw_install_targets())
+
+    def get_fw_install_targets(self):
+        if self.options.kernel_with_firmware == "true":
+            return ['firmware_install', 'INSTALL_FW_PATH='
+                    + os.path.join(self.installdir, "lib/firmware")]
+        return []
 
     def make_initrd(self):
         logger.info("generating driver initrd for kernel release: "
@@ -99,12 +132,15 @@ class KernelPlugin(snapcraft.plugins.kbuild.KBuildPlugin):
 
         inc_modules = []
         for l in modprobe_outs:
-            inc_modules.append(l[l.rfind('lib/modules/'+self.kernel_release):])
+            inc_modules.append(l[l.rfind('lib/modules/'
+                                         + self.kernel_release):])
 
         inc_modules.extend(['lib/modules/' + self.kernel_release
                             + '/modules.dep',
                             'lib/modules/' + self.kernel_release
                             + '/modules.dep.bin'])
+
+        inc_modules.extend(self.options.kernel_initrd_fws)
 
         logger.info("modprobe out: " + str(inc_modules))
 
