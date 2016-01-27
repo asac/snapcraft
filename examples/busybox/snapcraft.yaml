@@ -4,9 +4,9 @@ summary: busybox example to showcase the snapcraft kbuild plugin
 description: this is a snapcraft example package that contains the output of the snapcraft busybox example.
 icon: icon.png
 
-binaries:
+apps:
   ls:
-    exec: bin/ls
+    command: bin/ls
 
 parts:
   busybox:
