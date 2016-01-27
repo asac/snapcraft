@@ -20,6 +20,7 @@ import os
 import subprocess
 import tempfile
 import urllib
+import multiprocessing
 
 
 SNAPCRAFT_FILES = ['snapcraft.yaml', 'parts', 'stage', 'snap']
@@ -30,7 +31,8 @@ _DEFAULT_SCHEMADIR = '/usr/share/snapcraft/schema'
 _schemadir = _DEFAULT_SCHEMADIR
 _arch = None
 _arch_triplet = None
-
+j_count = 0
+verbose = False
 env = []
 
 
@@ -115,6 +117,26 @@ def isurl(url):
 def reset_env():
     global env
     env = []
+
+
+def set_build_threads(j):
+    global j_count
+    j_count = j
+
+
+def get_build_threads():
+    if j_count <= 0:
+        return multiprocessing.cpu_count() + 1
+    return j_count
+
+
+def set_verbose(v):
+    global verbose
+    verbose = v
+
+
+def get_verbose():
+    return verbose
 
 
 def replace_in_file(directory, file_pattern, search_pattern, replacement):
