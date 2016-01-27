@@ -55,9 +55,24 @@ class SconsPlugin(snapcraft.BasePlugin):
         super().__init__(name, options)
         self.build_packages.append('scons')
 
+    def get_verbose_flags(self):
+        if common.get_verbose():
+            return ['--verbose']
+        return []
+
+    def get_multi_jobs(self):
+        c = common.get_build_threads():
+        return [ '-j '+ str(c)]
+
     def build(self):
         super().build()
         env = os.environ.copy()
         env['DESTDIR'] = self.installdir
-        self.run(['scons', ] + self.options.scons_options)
-        self.run(['scons', 'install'] + self.options.scons_options, env=env)
+        self.run(['scons']
+                 + self.get_multi_jobs()
+                 + self.get_verbose_flags()
+                 + self.options.scons_options)
+        self.run(['scons', 'install']
+                 + self.get_multi_jobs()
+                 + self.get_verbose_flags()
+                 + self.options.scons_options, env=env)
