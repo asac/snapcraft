@@ -111,7 +111,7 @@ class KBuildPlugin(snapcraft.BasePlugin):
             self.run(['make', self.options.kdefconfig]
                      + self.get_verbose_makeflags())
         else:
-            os.copy(self.options.kconfigfile, config_path)
+            shutils.copy(self.options.kconfigfile, config_path)
 
     def do_patch_config(self, config_path):
         # prepend the generated file with provided kconfigs
