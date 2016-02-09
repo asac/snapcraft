@@ -23,8 +23,6 @@ Usage:
   build [options] [PART ...]
 
 Options:
-  -j [<threads>]        multi threaded build for plugins that support it;
-                        use 0 for cpu-count+1 [default: 0]
   -V                    verbose built for plugins that support it.
   -h --help             show this help message and exit.
 
@@ -39,8 +37,5 @@ from snapcraft import common
 def main(argv=None):
     argv = argv if argv else []
     args = docopt(__doc__, argv=argv)
-
-    common.set_build_threads(int(args['-j']))
-    common.set_verbose(args['-V'])
 
     lifecycle.execute('build', args['PART'])

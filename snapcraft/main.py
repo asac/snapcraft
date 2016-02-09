@@ -22,9 +22,11 @@ Usage:
   snapcraft [--version | --help] [options] COMMAND [ARGS ...]
 
 Options:
-  -h --help        show this help message and exit
-  -v --version     show program version and exit
-  -V --verbose     print additional information about command execution
+  -h --help              show this help message and exit
+  -v --version           show program version and exit
+  -V --verbose           print additional information about command execution
+  -j [<build-threads>]   indicate to build plugins to use multiple build
+                         threads/cores if possible  [default: 0]
 
 The available commands are:
   list-parts   List available parts which are like “source packages” for snaps.
@@ -56,6 +58,7 @@ from docopt import docopt
 from snapcraft import (
     log,
     commands,
+    common,
 )
 
 _VALID_COMMANDS = [
@@ -91,6 +94,10 @@ def main():
     except Exception as e:
         sys.exit(e)
 
+    common.set_build_threads(int(args['-j']))
+
+    if args['--verbose'] is not None:
+        common.set_verbose(True)
 
 if __name__ == '__main__':
     main()
